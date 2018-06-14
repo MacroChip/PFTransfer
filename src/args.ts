@@ -16,7 +16,15 @@ yargs
         nargs: 1,
       });
   })
-  .command('receive', 'receive a file')
+  .command('receive', 'receive a file', (yargs) => {
+    return yargs
+      .option('f', {
+        describe: 'filename that received file will be saved to',
+        type: 'string',
+        demand: 'please specify a filename to save to',
+        nargs: 1,
+      });
+  })
   .command('server', 'broker a file between two parties')
   .example('pftransfer send -f file -r recipient', "here's how you use it")
   .demandCommand(1, 'Please specify one of the commands!')
