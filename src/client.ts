@@ -1,29 +1,16 @@
-import * as tls from "tls";
-import * as fs from "fs";
-import { SENDING_SOCKET, RECEIVING_SOCKET } from "./server";
+import * as socketio from "socket.io-client";
 
-const start = (socket: number) => {
-    const options = {
-        rejectUnauthorized: process.env.NODE_ENV != "development",
-    };
-    
-    const client = tls.connect(socket, options, () => {
-        console.log('client connected', client.authorized ? 'authorized' : 'unauthorized');
-        process.stdin.pipe(client);
-        process.stdin.resume(); //not sure what this does
-    });
-    client.setEncoding('utf8');
-    client.on('data', (data) => {
-        console.log(data);
-    });
+const start = () => {
+    const socket = socketio.connect("http://localhost:8080");
+    socket.emit('chat message', "XD");
 };
 
 const send = () => {
-    start(SENDING_SOCKET);
+    start();
 };
 
 const receive = () => {
-    start(RECEIVING_SOCKET);
+    start();
 };
 
 export {

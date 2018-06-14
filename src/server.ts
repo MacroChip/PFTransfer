@@ -1,31 +1,21 @@
-import * as tls from "tls";
-import * as fs from "fs";
-
-const RECEIVING_SOCKET = 8000;
-const SENDING_SOCKET = 8001;
+import * as express from "express";
+import * as http from "http";
+import * as socketIo from "socket.io";
 
 const start = () => {
-    const options = {
-        pfx: fs.readFileSync('server.pfx'),
-    };
-    
-    const server = tls.createServer(options, (socket) => {
-        console.log('client connected', socket.authorized ? 'authorized' : 'unauthorized');
-        console.log(socket.address())
-        socket.write('welcome!\n');
-        socket.setEncoding('utf8');
-        socket.pipe(socket);
+    const app = express();
+    const httpServer = new http.Server(app);
+    const io = socketIo(httpServer);
+
+    io.on('connection', (socket) => {
+        console.log('a user connected');
     });
-    server.listen(RECEIVING_SOCKET, () => {
-        console.log('listening socket bound');
-    });
-    server.listen(SENDING_SOCKET, () => {
-        console.log('sending socket bound');
+
+    httpServer.listen(8080, () => {
+        console.log('listening on *:8080');
     });
 };
 
 export {
-    start,
-    RECEIVING_SOCKET,
-    SENDING_SOCKET
+    start
 };
