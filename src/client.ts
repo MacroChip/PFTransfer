@@ -3,8 +3,6 @@ import * as fs from "fs";
 
 const start = () => {
     const options = {
-        pfx: fs.readFileSync('server.pfx'),
-        ca: [ fs.readFileSync('server-cert.pem') ],
         rejectUnauthorized: process.env.NODE_ENV != "development",
     };
     

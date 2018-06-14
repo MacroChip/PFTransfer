@@ -7,7 +7,6 @@ const start = () => {
     const options = {
         pfx: fs.readFileSync('server.pfx'),
         ca: [ fs.readFileSync('server-cert.pem') ],
-        rejectUnauthorized: process.env.NODE_ENV != "development",
     };
     
     const server = tls.createServer(options, (socket) => {
