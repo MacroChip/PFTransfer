@@ -6,7 +6,6 @@ const RECEIVING_SOCKET = 8000;
 const start = () => {
     const options = {
         pfx: fs.readFileSync('server.pfx'),
-        ca: [ fs.readFileSync('server-cert.pem') ],
     };
     
     const server = tls.createServer(options, (socket) => {
