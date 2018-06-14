@@ -9,7 +9,8 @@ const send = () => {
 const receive = () => {
     const socket = socketio.connect("http://localhost:8080");
     socket.on('receive file', (file) => {
-        console.log(file);
+        fs.writeFileSync("received-file.txt", file);
+        console.log("received file done");
     });
     socket.emit("receive ready");
 };
