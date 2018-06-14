@@ -1,12 +1,13 @@
 import * as tls from "tls";
 import * as fs from "fs";
+import { SENDING_SOCKET, RECEIVING_SOCKET } from "./server";
 
-const start = () => {
+const start = (socket: number) => {
     const options = {
         rejectUnauthorized: process.env.NODE_ENV != "development",
     };
     
-    const client = tls.connect(8000, options, () => {
+    const client = tls.connect(socket, options, () => {
         console.log('client connected', client.authorized ? 'authorized' : 'unauthorized');
         process.stdin.pipe(client);
         process.stdin.resume(); //not sure what this does
@@ -18,11 +19,11 @@ const start = () => {
 };
 
 const send = () => {
-    start();
+    start(SENDING_SOCKET);
 };
 
 const receive = () => {
-    start();
+    start(RECEIVING_SOCKET);
 };
 
 export {
