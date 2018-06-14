@@ -7,10 +7,19 @@ const start = () => {
     const httpServer = new http.Server(app);
     const io = socketIo(httpServer);
 
+    let lastFileSent;
+
     io.on('connection', (socket) => {
         console.log('a user connected');
-        socket.on('file', (file) => {
-            console.log('message: ' + file);
+        socket.on('send file', (file: Buffer) => {
+            lastFileSent = file.toString();
+            console.log("holding", lastFileSent);
+        });
+        socket.on('receive ready', () => {
+            if (lastFileSent != undefined) {
+                console.log("sending", lastFileSent);
+                socket.emit('receive file', lastFileSent);
+            }
         });
     });
 
