@@ -9,6 +9,9 @@ const start = () => {
 
     io.on('connection', (socket) => {
         console.log('a user connected');
+        socket.on('file', (file) => {
+            console.log('message: ' + file);
+        });
     });
 
     httpServer.listen(8080, () => {
