@@ -3,14 +3,30 @@ import * as socketio from "socket.io-client";
 
 const send = (filename: string, recipient: string) => {
     const socket = socketio.connect("http://localhost:8080");
-    socket.emit('send file', fs.readFileSync(filename));
+    socket.emit('send file', filename);
+    let stream = fs.createReadStream(filename); //default chunk size
+    stream.on('end', () => {
+        console.log('Read all data.');
+        socket.emit('transfer complete');
+    });
+    stream.on('error', () => {
+        console.log('Error reading data.');
+    });
+    stream.on('data', (data) => {
+        socket.emit('file data', data);
+    });
 };
 
-const receive = (filename: string) => {
+const receive = (overwriteFilename: string) => {
     const socket = socketio.connect("http://localhost:8080");
-    socket.on('receive file', (file) => {
-        fs.writeFileSync(filename, file);
-        console.log("received file done");
+    let fullFileData = "";
+    socket.on('transfer complete', () => {
+        console.log("transfer complete. Writing data", fullFileData);
+        fs.writeFileSync(overwriteFilename, fullFileData);
+    });
+    socket.on('file data', chunk => {
+        console.log("received chunk", chunk.toString());
+        fullFileData += chunk;
     });
     socket.emit("receive ready");
 };
