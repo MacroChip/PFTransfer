@@ -1,6 +1,7 @@
 import * as express from "express";
 import * as http from "http";
 import * as socketIo from "socket.io";
+import { Socket } from "socket.io";
 
 const start = () => {
     const app = express();
@@ -8,10 +9,10 @@ const start = () => {
     const io = socketIo(httpServer);
 
     let lastFilenameSent;
-    let sender;
-    let receiver;
+    let sender: Socket;
+    let receiver: Socket;
 
-    io.on('connection', (socket) => {
+    io.on('connection', (socket: Socket) => {
         console.log('a user connected');
         socket.on('send file', (filename) => {
             lastFilenameSent = filename;
