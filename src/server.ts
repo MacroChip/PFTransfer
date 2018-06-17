@@ -17,12 +17,16 @@ const start = () => {
             lastFilenameSent = filename;
             sender = socket;
             console.log("holding", lastFilenameSent);
+            if (receiver != undefined) {
+                console.log("sending", lastFilenameSent);
+                sender.emit('receiver ready');
+            }
         });
         socket.on('receive ready', () => {
             receiver = socket;
-            if (lastFilenameSent != undefined) {
+            if (sender != undefined) {
                 console.log("sending", lastFilenameSent);
-                socket.emit('receive file', lastFilenameSent);
+                sender.emit('receiver ready', lastFilenameSent);
             }
         });
         socket.on('file data', chunk => {

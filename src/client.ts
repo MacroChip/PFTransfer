@@ -5,15 +5,17 @@ const send = (filename: string, recipient: string) => {
     const socket = socketio.connect("http://localhost:8080");
     socket.emit('send file', filename);
     let stream = fs.createReadStream(filename); //default chunk size
-    stream.on('end', () => {
-        console.log('Read all data.');
-        socket.emit('transfer complete');
-    });
-    stream.on('error', () => {
-        console.log('Error reading data.');
-    });
-    stream.on('data', (data) => {
-        socket.emit('file data', data);
+    socket.on('receiver ready', () => {
+        stream.on('end', () => {
+            console.log('Read all data.');
+            socket.emit('transfer complete');
+        });
+        stream.on('error', () => {
+            console.log('Error reading data.');
+        });
+        stream.on('data', (data) => {
+            socket.emit('file data', data);
+        });
     });
 };
 
