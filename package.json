@@ -4,7 +4,7 @@
   "description": "Personal File Transfer",
   "main": "dist/index.js",
   "scripts": {
-    "start": "tsc && NODE_ENV=development node dist/index.js",
+    "start": "tsc && NODE_ENV=development electron .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc"
   },
