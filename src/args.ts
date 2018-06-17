@@ -39,7 +39,7 @@ yargs
       alias: 'server',
       type: 'string',
       describe: 'Optional parameter to specify the api server to use',
-      default: 'http://localhost:8089'
+      default: 'http://localhost:8080'
   })
   .help('h')
   .alias('h', 'help')

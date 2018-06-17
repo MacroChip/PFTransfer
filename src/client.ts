@@ -1,8 +1,8 @@
 import * as fs from "fs";
 import * as socketio from "socket.io-client";
 
-const send = (filename: string, recipient: string) => {
-    const socket = socketio.connect("http://localhost:8080");
+const send = (filename: string, recipient: string, server: string) => {
+    const socket = socketio.connect(server);
     socket.emit('send file', filename, recipient);
     let stream = fs.createReadStream(filename); //default chunk size
     socket.on('receiver ready', () => {
@@ -19,8 +19,8 @@ const send = (filename: string, recipient: string) => {
     });
 };
 
-const receive = (overwriteFilename: string, identity: string) => {
-    const socket = socketio.connect("http://localhost:8080");
+const receive = (overwriteFilename: string, identity: string, server: string) => {
+    const socket = socketio.connect(server);
     let fullFileData = "";
     socket.on('transfer complete', () => {
         console.log("transfer complete. Writing data", fullFileData);
