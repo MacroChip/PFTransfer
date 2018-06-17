@@ -7,5 +7,5 @@ if (argv.argv._[0] === "server") {
 } else if (argv.argv._[0] === "send") {
     client.send(argv.argv.f, argv.argv.r);
 } else if (argv.argv._[0] === "receive") {
-    client.receive(argv.argv.f);
+    client.receive(argv.argv.f, argv.argv.i);
 }

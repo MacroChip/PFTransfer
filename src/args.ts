@@ -23,6 +23,12 @@ yargs
         type: 'string',
         demand: 'please specify a filename to save to',
         nargs: 1,
+      })
+      .option('i', {
+        describe: 'identity',
+        type: 'string',
+        demand: 'please specify an identity. This must match the sender\'s "r" flag argument',
+        nargs: 1,
       });
   })
   .command('server', 'broker a file between two parties')

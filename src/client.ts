@@ -3,7 +3,7 @@ import * as socketio from "socket.io-client";
 
 const send = (filename: string, recipient: string) => {
     const socket = socketio.connect("http://localhost:8080");
-    socket.emit('send file', filename);
+    socket.emit('send file', filename, recipient);
     let stream = fs.createReadStream(filename); //default chunk size
     socket.on('receiver ready', () => {
         stream.on('end', () => {
@@ -19,7 +19,7 @@ const send = (filename: string, recipient: string) => {
     });
 };
 
-const receive = (overwriteFilename: string) => {
+const receive = (overwriteFilename: string, identity: string) => {
     const socket = socketio.connect("http://localhost:8080");
     let fullFileData = "";
     socket.on('transfer complete', () => {
@@ -30,7 +30,7 @@ const receive = (overwriteFilename: string) => {
         console.log("received chunk", chunk.toString());
         fullFileData += chunk;
     });
-    socket.emit("receive ready");
+    socket.emit("receive ready", identity);
 };
 
 export {
