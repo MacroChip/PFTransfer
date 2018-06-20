@@ -12,8 +12,4 @@ let main = () => {
     }
 };
 
-main(); //for when the cli is run
-
-export { //for when the cli is used in the gui
-    main
-}
+main();
