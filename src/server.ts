@@ -1,11 +1,11 @@
 import * as express from "express";
-import * as http from "http";
+import { Server } from "http";
 import * as socketIo from "socket.io";
 import { Socket } from "socket.io";
 
 const start = () => {
     const app = express();
-    const httpServer = new http.Server(app);
+    const httpServer = new Server(app);
     const io = socketIo(httpServer);
 
     let lastFilenameSent: string;
@@ -43,7 +43,7 @@ const start = () => {
             receiver.emit('transfer complete');
         });
     });
-
+    console.log("starting server");
     httpServer.listen(8080, () => {
         console.log('listening on *:8080');
     });

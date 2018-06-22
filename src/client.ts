@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as socketio from "socket.io-client";
 
-const send = (filename: string, recipient: string, server: string) => {
+const send = (filename: string, recipient: string, server: string, callback?: Function) => {
     const socket = socketio.connect(server);
     socket.emit('send file', filename, recipient);
     let stream = fs.createReadStream(filename); //default chunk size
@@ -9,9 +9,11 @@ const send = (filename: string, recipient: string, server: string) => {
         stream.on('end', () => {
             console.log('Read all data.');
             socket.emit('transfer complete');
+            if (callback) callback();
         });
-        stream.on('error', () => {
+        stream.on('error', (error) => {
             console.log('Error reading data.');
+            if (callback) callback(error);
         });
         stream.on('data', (data) => {
             socket.emit('file data', data);
@@ -19,12 +21,13 @@ const send = (filename: string, recipient: string, server: string) => {
     });
 };
 
-const receive = (overwriteFilename: string, identity: string, server: string) => {
+const receive = (overwriteFilename: string, identity: string, server: string, callback?: Function) => {
     const socket = socketio.connect(server);
     let fullFileData = "";
     socket.on('transfer complete', () => {
         console.log("transfer complete. Writing data", fullFileData);
         fs.writeFileSync(overwriteFilename, fullFileData);
+        if (callback) callback();
     });
     socket.on('file data', chunk => {
         console.log("received chunk", chunk.toString());
