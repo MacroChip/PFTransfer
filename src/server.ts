@@ -2,51 +2,50 @@ import * as express from "express";
 import { Server } from "http";
 import * as socketIo from "socket.io";
 import { Socket } from "socket.io";
+const p2p = require('socket.io-p2p-server').Server;
+const uuidv4 = require('uuid/v4');
 
 const start = () => {
     const app = express();
     const httpServer = new Server(app);
     const io = socketIo(httpServer);
+    // io.use(p2p);
 
-    let lastFilenameSent: string;
-    let sender: Socket;
     let receiver: Socket;
     let intendedReceiverId: string;
-    let reportedReceiverId: string;
+    let reportedRecieverId: string;
+    let roomName: string = uuidv4();
 
     io.on('connection', (socket: Socket) => {
         console.log('a user connected');
-        socket.on('send file', (filename: string, recipient: string) => {
-            lastFilenameSent = filename;
-            sender = socket;
+        socket.on('send file', (recipient: string) => {
             intendedReceiverId = recipient;
-            console.log("holding", lastFilenameSent);
-            if (receiver != undefined && intendedReceiverId === reportedReceiverId) {
-                console.log("sending", lastFilenameSent);
-                sender.emit('receiver ready');
+            socket.join(roomName);
+            p2p(socket, null, { "name": roomName });
+            console.log("sender connected");
+            if (reportedRecieverId && reportedRecieverId === recipient) {
+                connectReceiverToExistingRoom(receiver);
             }
         });
         socket.on('receive ready', (identity: string) => {
-            receiver = socket;
-            reportedReceiverId = identity;
-            if (sender != undefined && intendedReceiverId === reportedReceiverId) {
-                console.log("sending", lastFilenameSent);
-                sender.emit('receiver ready', lastFilenameSent);
+            if (intendedReceiverId && identity === intendedReceiverId) {
+                connectReceiverToExistingRoom(socket);
+            } else if (!intendedReceiverId) {
+                reportedRecieverId = identity;
+                receiver = socket;
             }
-        });
-        socket.on('file data', chunk => {
-            console.log('relaying chunk', chunk.toString());
-            receiver.emit('file data', chunk);
-        });
-        socket.on('transfer complete', chunk => {
-            console.log('transfer complete');
-            receiver.emit('transfer complete');
         });
     });
     console.log("starting server");
     httpServer.listen(8080, () => {
         console.log('listening on *:8080');
     });
+
+    let connectReceiverToExistingRoom = (socket: Socket) => {
+        console.log("sending");
+        socket.join(roomName);
+        p2p(socket, null, { "name": roomName });
+    };
 };
 
 export {

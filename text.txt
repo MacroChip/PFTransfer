@@ -1,1 +1,13 @@
 XD
+installing socket.io-p2p-server gave this:
+npm WARN deprecated jade@0.26.3: Jade has been renamed to pug, please install the latest version of pug instead of jade
+npm WARN deprecated graceful-fs@2.0.3: please upgrade to graceful-fs 4 for compatibility with current and future versions of Node.js
+npm WARN deprecated minimatch@0.2.14: Please update to minimatch 3.0.2 or higher to avoid a RegExp DoS issue
+npm WARN deprecated formatio@1.1.1: This package is unmaintained. Use @sinonjs/formatio instead
+npm WARN notice [SECURITY] growl has the following vulnerability: 1 critical. Go here for more details: https://nodesecurity.io/advisories?search=growl&version=1.8.1 - Run `npm i npm@latest -g` to upgrade your npm version, and then `npm audit` to get more info.
+npm WARN notice [SECURITY] ms has the following vulnerability: 1 moderate. Go here for more details: https://nodesecurity.io/advisories?search=ms&version=0.6.2 - Run `npm i npm@latest -g` to upgrade your npm version, and then `npm audit` to get more info.
+npm WARN notice [SECURITY] minimatch has the following vulnerability: 1 high. Go here for more details: https://nodesecurity.io/advisories?search=minimatch&version=0.2.14 - Run `npm i npm@latest -g` to upgrade your npm version, and then `npm audit` to get more info.
+npm WARN notice [SECURITY] ms has the following vulnerability: 1 moderate. Go here for more details: https://nodesecurity.io/advisories?search=ms&version=0.7.0 - Run `npm i npm@latest -g` to upgrade your npm version, and then `npm audit` to get more info.
+npm WARN notice [SECURITY] debug has the following vulnerability: 1 low. Go here for more details: https://nodesecurity.io/advisories?search=debug&version=2.1.3 - Run `npm i npm@latest -g` to upgrade your npm version, and then `npm audit` to get more info.
+npm WARN notice [SECURITY] debug has the following vulnerability: 1 low. Go here for more details: https://nodesecurity.io/advisories?search=debug&version=2.0.0 - Run `npm i npm@latest -g` to upgrade your npm version, and then `npm audit` to get more info.
+npm WARN pftransfer@1.0.0 No repository field.
