@@ -8,45 +8,48 @@ const start = () => {
     const httpServer = new Server(app);
     const io = socketIo(httpServer);
 
-    let lastFilenameSent: string;
     let sender: Socket;
+    let senderSignalData;
     let receiver: Socket;
+    let receiverSignalData;
     let intendedReceiverId: string;
     let reportedReceiverId: string;
 
     io.on('connection', (socket: Socket) => {
         console.log('a user connected');
-        socket.on('send file', (filename: string, recipient: string) => {
-            lastFilenameSent = filename;
+        socket.on('sender', () => {
             sender = socket;
-            intendedReceiverId = recipient;
-            console.log("holding", lastFilenameSent);
-            if (receiver != undefined && intendedReceiverId === reportedReceiverId) {
-                console.log("sending", lastFilenameSent);
-                sender.emit('receiver ready');
-            }
         });
-        socket.on('receive ready', (identity: string) => {
+        socket.on('sender signal', (data) => {
+            console.log("sender signal");
+            senderSignalData = data;
+            sendSignalData();
+        });
+        socket.on('receiver signal', (data) => {
+            console.log("receiver signal");
             receiver = socket;
-            reportedReceiverId = identity;
-            if (sender != undefined && intendedReceiverId === reportedReceiverId) {
-                console.log("sending", lastFilenameSent);
-                sender.emit('receiver ready', lastFilenameSent);
-            }
+            receiverSignalData = data;
+            sendSignalData();
         });
-        socket.on('file data', chunk => {
-            console.log('relaying chunk', chunk.toString());
-            receiver.emit('file data', chunk);
-        });
-        socket.on('transfer complete', chunk => {
-            console.log('transfer complete');
-            receiver.emit('transfer complete');
+        socket.on('receiver', () => {
+            receiver = socket;
+            sendSignalData();
         });
     });
     console.log("starting server");
     httpServer.listen(8080, () => {
         console.log('listening on *:8080');
     });
+
+    let sendSignalData = () => {
+        if (sender && receiver && senderSignalData) {
+            receiver.emit('sender signal', senderSignalData);
+            senderSignalData = null;
+        } else if (sender && receiver && receiverSignalData) {
+            sender.emit('receiver signal', receiverSignalData);
+            receiverSignalData = null;
+        }
+    };
 };
 
 export {
