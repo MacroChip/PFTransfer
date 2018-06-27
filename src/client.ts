@@ -5,7 +5,7 @@ import * as wrtc from 'wrtc';
 
 const send = (filename: string, recipient: string, server: string, callback?: Function) => {
     const socket = socketio.connect(server);
-    socket.emit('sender');
+    socket.emit('sender', recipient);
     var p = new Peer({ initiator: true, trickle: true, wrtc: wrtc })
     p.on('error', (err) => { console.log('error', err) })
 
@@ -38,7 +38,7 @@ const send = (filename: string, recipient: string, server: string, callback?: Fu
 
 const receive = (overwriteFilename: string, identity: string, server: string, callback?: Function) => {
     const socket = socketio.connect(server);
-    socket.emit('receiver');
+    socket.emit('receiver', identity);
     var p = new Peer({ initiator: false, trickle: true, wrtc: wrtc })
     p.on('error', (err) => { console.log('error', err) })
     p.on('signal', (data) => {

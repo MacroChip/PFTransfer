@@ -17,8 +17,9 @@ const start = () => {
 
     io.on('connection', (socket: Socket) => {
         console.log('a user connected');
-        socket.on('sender', () => {
+        socket.on('sender', (recipient) => {
             sender = socket;
+            intendedReceiverId = recipient;
         });
         socket.on('sender signal', (data) => {
             console.log("sender signal");
@@ -31,8 +32,9 @@ const start = () => {
             receiverSignalData.push(data);
             sendSignalData();
         });
-        socket.on('receiver', () => {
+        socket.on('receiver', (id) => {
             receiver = socket;
+            reportedReceiverId = id;
             sendSignalData();
         });
     });
@@ -42,12 +44,12 @@ const start = () => {
     });
 
     let sendSignalData = () => {
-        if (sender && receiver && senderSignalData.length > 0) {
+        if (sender && receiver && intendedReceiverId === reportedReceiverId && senderSignalData.length > 0) {
             senderSignalData.forEach(item => {
                 receiver.emit('sender signal', item);
             });
             senderSignalData = [];
-        } else if (sender && receiver && receiverSignalData.length > 0) {
+        } else if (sender && receiver && intendedReceiverId === reportedReceiverId && receiverSignalData.length > 0) {
             receiverSignalData.forEach(item => {
                 sender.emit('receiver signal', item);
             });
