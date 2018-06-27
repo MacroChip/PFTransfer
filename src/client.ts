@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import * as socketio from "socket.io-client";
-var Peer = require('simple-peer');
+import * as Peer from 'simple-peer';
 var wrtc = require('wrtc');
 
 const send = (filename: string, recipient: string, server: string, callback?: Function) => {
