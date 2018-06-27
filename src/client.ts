@@ -36,7 +36,7 @@ const send = (filename: string, recipient: string, server: string, callback?: Fu
     });
 };
 
-const receive = (overwriteFilename: string, identity: string, server: string, callback?: Function) => {
+const receive = (overwriteFilename: string, identity: string, server: string, callback: (err: NodeJS.ErrnoException) => void) => {
     const socket = socketio.connect(server);
     socket.emit('receiver', identity);
     var p = new Peer({ initiator: false, trickle: true, wrtc: wrtc })
@@ -56,8 +56,7 @@ const receive = (overwriteFilename: string, identity: string, server: string, ca
         console.log(data)
         if (data.toString() === 'transfer complete') {
             console.log("transfer complete. Writing data", fullFileData);
-            fs.writeFileSync(overwriteFilename, fullFileData);
-            if (callback) callback();
+            fs.writeFile(overwriteFilename, fullFileData, { flag: "wx" }, callback);
         } else {
             console.log("received chunk", data.toString());
             fullFileData += data;

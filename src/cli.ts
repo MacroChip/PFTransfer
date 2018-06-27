@@ -8,7 +8,9 @@ let main = () => {
     } else if (argv.argv._[0] === "send") {
         client.send(argv.argv.f, argv.argv.r, argv.argv.s);
     } else if (argv.argv._[0] === "receive") {
-        client.receive(argv.argv.f, argv.argv.i, argv.argv.s);
+        client.receive(argv.argv.f, argv.argv.i, argv.argv.s, (err) => {
+            console.log("done", err);
+        });
     }
 };
 
