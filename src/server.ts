@@ -20,6 +20,7 @@ const start = () => {
         socket.on('sender', (recipient) => {
             sender = socket;
             intendedReceiverId = recipient;
+            senderSignalData = [];
         });
         socket.on('sender signal', (data) => {
             console.log("sender signal");
@@ -35,6 +36,7 @@ const start = () => {
         socket.on('receiver', (id) => {
             receiver = socket;
             reportedReceiverId = id;
+            receiverSignalData = [];
             sendSignalData();
         });
     });
