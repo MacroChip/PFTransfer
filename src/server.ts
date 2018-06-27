@@ -9,9 +9,9 @@ const start = () => {
     const io = socketIo(httpServer);
 
     let sender: Socket;
-    let senderSignalData;
+    let senderSignalData = [];
     let receiver: Socket;
-    let receiverSignalData;
+    let receiverSignalData = [];
     let intendedReceiverId: string;
     let reportedReceiverId: string;
 
@@ -22,13 +22,13 @@ const start = () => {
         });
         socket.on('sender signal', (data) => {
             console.log("sender signal");
-            senderSignalData = data;
+            senderSignalData.push(data);
             sendSignalData();
         });
         socket.on('receiver signal', (data) => {
             console.log("receiver signal");
             receiver = socket;
-            receiverSignalData = data;
+            receiverSignalData.push(data);
             sendSignalData();
         });
         socket.on('receiver', () => {
@@ -42,12 +42,16 @@ const start = () => {
     });
 
     let sendSignalData = () => {
-        if (sender && receiver && senderSignalData) {
-            receiver.emit('sender signal', senderSignalData);
-            senderSignalData = null;
-        } else if (sender && receiver && receiverSignalData) {
-            sender.emit('receiver signal', receiverSignalData);
-            receiverSignalData = null;
+        if (sender && receiver && senderSignalData.length > 0) {
+            senderSignalData.forEach(item => {
+                receiver.emit('sender signal', item);
+            });
+            senderSignalData = [];
+        } else if (sender && receiver && receiverSignalData.length > 0) {
+            receiverSignalData.forEach(item => {
+                sender.emit('receiver signal', item);
+            });
+            receiverSignalData = [];
         }
     };
 };
