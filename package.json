@@ -22,6 +22,7 @@
     "simple-peer": "^9.1.2",
     "socket.io": "^2.1.1",
     "typescript": "^2.9.2",
+    "wrtc": "^0.1.5",
     "yargs": "^11.0.0"
   },
   "devDependencies": {

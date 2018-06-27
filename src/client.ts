@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as socketio from "socket.io-client";
 import * as Peer from 'simple-peer';
-var wrtc = require('wrtc');
+import * as wrtc from 'wrtc';
 
 const send = (filename: string, recipient: string, server: string, callback?: Function) => {
     const socket = socketio.connect(server);
@@ -54,12 +54,12 @@ const receive = (overwriteFilename: string, identity: string, server: string, ca
     })
     p.on('data', (data) => {
         console.log(data)
-        if (typeof data === 'string' && data === 'transfer complete') {
+        if (data.toString() === 'transfer complete') {
             console.log("transfer complete. Writing data", fullFileData);
             fs.writeFileSync(overwriteFilename, fullFileData);
             if (callback) callback();
         } else {
-            console.log("received chunk", data);
+            console.log("received chunk", data.toString());
             fullFileData += data;
         }
     })
