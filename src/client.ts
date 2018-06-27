@@ -6,22 +6,6 @@ var wrtc = require('wrtc');
 const send = (filename: string, recipient: string, server: string, callback?: Function) => {
     const socket = socketio.connect(server);
     socket.emit('sender');
-    // socket.emit('send file', recipient);
-    // let stream = fs.createReadStream(filename); //default chunk size
-    // socket.on('receiver ready', () => {
-    //     stream.on('end', () => {
-    //         console.log('Read all data.');
-    //         socket.emit('transfer complete');
-    //         if (callback) callback();
-    //     });
-    //     stream.on('error', (error) => {
-    //         console.log('Error reading data.');
-    //         if (callback) callback(error);
-    //     });
-    //     stream.on('data', (data) => {
-    //         socket.emit('file data', data);
-    //     });
-    // });
     var p = new Peer({ initiator: true, trickle: true, wrtc: wrtc })
     p.on('error', function (err) { console.log('error', err) })
 
@@ -36,12 +20,20 @@ const send = (filename: string, recipient: string, server: string, callback?: Fu
 
     p.on('connect', function () {
         console.log('CONNECT')
-        p.send('sender to receiver')
-    })
-
-    p.on('data', function (data) {
-        console.log('data: ' + data)
-    })
+        let stream = fs.createReadStream(filename); //default chunk size
+        stream.on('end', () => {
+            console.log('Read all data.');
+            p.send('transfer complete');
+            if (callback) callback();
+        });
+        stream.on('error', (error) => {
+            console.log('Error reading data.');
+            if (callback) callback(error);
+        });
+        stream.on('data', (data) => {
+            p.send(data);
+        });
+    });
 };
 
 const receive = (overwriteFilename: string, identity: string, server: string, callback?: Function) => {
@@ -59,22 +51,18 @@ const receive = (overwriteFilename: string, identity: string, server: string, ca
     });
     p.on('connect', function () {
         console.log('CONNECT')
-        p.send('receiver to sender')
     })
-
-    p.on('data', function (data) {
-        console.log('data: ' + data)
+    p.on('data', (data) => {
+        console.log(data)
+        if (typeof data === 'string' && data === 'transfer complete') {
+            console.log("transfer complete. Writing data", fullFileData);
+            fs.writeFileSync(overwriteFilename, fullFileData);
+            if (callback) callback();
+        } else {
+            console.log("received chunk", data);
+            fullFileData += data;
+        }
     })
-    // socket.on('transfer complete', () => {
-    //     console.log("transfer complete. Writing data", fullFileData);
-    //     fs.writeFileSync(overwriteFilename, fullFileData);
-    //     if (callback) callback();
-    // });
-    // socket.on('file data', chunk => {
-    //     console.log("received chunk", chunk.toString());
-    //     fullFileData += chunk;
-    // });
-    // socket.emit("receive ready", identity);
 };
 
 export {
