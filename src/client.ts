@@ -7,9 +7,9 @@ const send = (filename: string, recipient: string, server: string, callback?: Fu
     const socket = socketio.connect(server);
     socket.emit('sender');
     var p = new Peer({ initiator: true, trickle: true, wrtc: wrtc })
-    p.on('error', function (err) { console.log('error', err) })
+    p.on('error', (err) => { console.log('error', err) })
 
-    p.on('signal', function (data) {
+    p.on('signal', (data) => {
         console.log('SIGNAL', JSON.stringify(data))
         socket.emit('sender signal', JSON.stringify(data));
     })
@@ -18,7 +18,7 @@ const send = (filename: string, recipient: string, server: string, callback?: Fu
         p.signal(JSON.parse(data));
     });
 
-    p.on('connect', function () {
+    p.on('connect', () => {
         console.log('CONNECT')
         let stream = fs.createReadStream(filename); //default chunk size
         stream.on('end', () => {
@@ -40,8 +40,8 @@ const receive = (overwriteFilename: string, identity: string, server: string, ca
     const socket = socketio.connect(server);
     socket.emit('receiver');
     var p = new Peer({ initiator: false, trickle: true, wrtc: wrtc })
-    p.on('error', function (err) { console.log('error', err) })
-    p.on('signal', function (data) {
+    p.on('error', (err) => { console.log('error', err) })
+    p.on('signal', (data) => {
         console.log('SIGNAL', JSON.stringify(data))
         socket.emit('receiver signal', JSON.stringify(data));
     });
@@ -49,7 +49,7 @@ const receive = (overwriteFilename: string, identity: string, server: string, ca
     socket.on('sender signal', (data) => {
         p.signal(JSON.parse(data));
     });
-    p.on('connect', function () {
+    p.on('connect', () => {
         console.log('CONNECT')
     })
     p.on('data', (data) => {
