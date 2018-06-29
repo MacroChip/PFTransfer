@@ -6,12 +6,12 @@ document.addEventListener("DOMContentLoaded", (event) => {
         server.start();
     });
     document.getElementById("send").addEventListener("click", () => {
-        client.send("text.txt", "xdboi", 'http://localhost:8080', (error) => {
+        client.send((<HTMLInputElement>document.getElementById("sendFilename")).value, (<HTMLInputElement>document.getElementById("receiverId")).value, 'http://localhost:8080', (error) => {
             console.log("done", error);
         });
     });
     document.getElementById("receive").addEventListener("click", () => {
-        client.receive("fdsx.txt", "xdboi", 'http://localhost:8080', (error) => {
+        client.receive((<HTMLInputElement>document.getElementById("receiveFilename")).value, (<HTMLInputElement>document.getElementById("myId")).value, 'http://localhost:8080', (error) => {
             console.log("done", error);
         });
     });
