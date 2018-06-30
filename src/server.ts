@@ -41,8 +41,9 @@ const start = () => {
         });
     });
     console.log("starting server");
-    httpServer.listen(8080, () => {
-        console.log('listening on *:8080');
+    const port = process.env.PORT || 8080;
+    httpServer.listen(port, () => {
+        console.log('listening on *:' + port);
     });
 
     let sendSignalData = () => {
