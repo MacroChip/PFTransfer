@@ -9,6 +9,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc"
   },
+  "engines": {
+    "node": "8.10.0"
+  },
   "author": "Chip Thien",
   "license": "ISC",
   "dependencies": {
