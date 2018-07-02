@@ -2,3 +2,4 @@ appId: "pftransfer"
 productName: "pftransfer"
 win:
   target: portable
+asar: false
