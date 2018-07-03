@@ -55,12 +55,11 @@ const receive = (overwriteFilename: string, identity: string, server: string, ca
         console.log('CONNECT')
     })
     p.on('data', (data) => {
-        console.log(data)
         if (data.toString() === 'transfer complete') {
-            console.log("transfer complete. Writing data", fullFileData);
+            console.log("transfer complete. Writing data");
             fs.writeFile(overwriteFilename, fullFileData, { flag: "wx" }, callback);
         } else {
-            console.log("received chunk", data.toString());
+            console.log("received chunk");
             fullFileData += data;
         }
     })

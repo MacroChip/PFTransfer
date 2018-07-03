@@ -7,21 +7,23 @@
   <body>
     <h1>PFTransfter</h1>
     <div>
-      <button id="startServer">Start Server</button>
+      <button id="startServer">Wake Up Server</button>
     </div>
     <div>
       <label for="sendFilename">File to send</label>
-      <input id="sendFilename" type="text" />
+      <input id="sendFilename" type="file" />
       <label for="receiverId">Receiver Id</label>
       <input id="receiverId" type="text" />
       <button id="send">Send</button>
     </div>
     <div>
-      <label for="receiveFilename">Receive Filename</label>
-      <input id="receiveFilename" type="text" />
       <label for="myId">My Id</label>
       <input id="myId" type="text" />
       <button id="receive">Receive</button>
+    </div>
+    <div>
+      <label for="status">Status:</label>
+      <textarea readonly id="status"></textarea>
     </div>
   </body>
   <script>
