@@ -8,7 +8,10 @@ const send = (filename: string, recipient: string, server: string, callback?: Fu
     const socket = socketio.connect(server);
     socket.emit('sender', recipient);
     var p = new Peer({ initiator: true, trickle: true, wrtc: wrtc })
-    p.on('error', (err) => { console.log('error', err) })
+    p.on('error', (err) => {
+        console.log('error', err);
+        if (callback) callback(err);
+    })
 
     p.on('signal', (data) => {
         console.log('SIGNAL', JSON.stringify(data))
@@ -42,12 +45,19 @@ const receive = (overwriteFilename: string, identity: string, server: string, ca
     const socket = socketio.connect(server);
     socket.emit('receiver', identity);
     var p = new Peer({ initiator: false, trickle: true, wrtc: wrtc })
-    p.on('error', (err) => { console.log('error', err) })
+    const stream = fs.createWriteStream(overwriteFilename, { flags: "wx" })
+    stream.on('error', (error) => {
+        console.log("error writing file: " + error);
+        callback(error);
+    })
+    p.on('error', (err) => {
+        console.log('error', err);
+        callback(err);
+    })
     p.on('signal', (data) => {
         console.log('SIGNAL', JSON.stringify(data))
         socket.emit('receiver signal', JSON.stringify(data));
     });
-    let fullFileData = "";
     socket.on('sender signal', (data) => {
         p.signal(JSON.parse(data));
     });
@@ -56,11 +66,14 @@ const receive = (overwriteFilename: string, identity: string, server: string, ca
     })
     p.on('data', (data) => {
         if (data.toString() === 'transfer complete') {
-            console.log("transfer complete. Writing data");
-            fs.writeFile(overwriteFilename, fullFileData, { flag: "wx" }, callback);
+            console.log("transfer complete.");
+            stream.end(() => {
+                console.log("file written")
+                callback(null);
+            });
         } else {
             console.log("received chunk");
-            fullFileData += data;
+            stream.write(data); //TODO: respect backpressure and draining
         }
     })
 };
