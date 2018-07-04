@@ -9,7 +9,7 @@ const send = (filename: string, recipient: string, server: string, callback?: Fu
     socket.emit('sender', recipient);
     var p = new Peer({ initiator: true, trickle: true, wrtc: wrtc })
     p.on('error', (err) => {
-        console.log('error', err);
+        console.log('error: ' + err);
         if (callback) callback(err);
     })
 
@@ -51,7 +51,7 @@ const receive = (overwriteFilename: string, identity: string, server: string, ca
         callback(error);
     })
     p.on('error', (err) => {
-        console.log('error', err);
+        console.log('error:' + err);
         callback(err);
     })
     p.on('signal', (data) => {

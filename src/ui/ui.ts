@@ -22,12 +22,12 @@ document.addEventListener("DOMContentLoaded", (event) => {
     });
     document.getElementById("send").addEventListener("click", () => {
         client.send((<HTMLInputElement>document.getElementById("sendFilename")).files[0].path, (<HTMLInputElement>document.getElementById("receiverId")).value, serverUrl, (error) => {
-            console.log("done", error);
+            console.log("done: " + error);
         });
     });
     document.getElementById("receive").addEventListener("click", () => {
         client.receive(unusedFilename.sync(path.join(downloadPath, "pftransfer-download.txt")), (<HTMLInputElement>document.getElementById("myId")).value, serverUrl, (error) => {
-            console.log("done", error);
+            console.log("done: " + error);
         });
     });
 });
