@@ -2,6 +2,8 @@ import * as fs from "fs";
 import * as socketio from "socket.io-client";
 import * as Peer from 'simple-peer';
 import * as wrtc from 'wrtc';
+import * as unusedFilename from "unused-filename";
+import * as path from "path";
 
 const send = (filename: string, recipient: string, server: string, callback?: Function) => {
     console.log(`sending ${filename} to ${recipient}`);
@@ -40,12 +42,13 @@ const send = (filename: string, recipient: string, server: string, callback?: Fu
     });
 };
 
-const receive = (overwriteFilename: string, identity: string, server: string, callback: (err: NodeJS.ErrnoException) => void) => {
-    console.log(`receiving ${overwriteFilename} as ${identity}`);
+const receive = (saveOptions: SaveOptions, identity: string, server: string, callback: (err: NodeJS.ErrnoException) => void) => {
+    const fullPath = unusedFilename.sync(path.join(saveOptions.path, saveOptions.overwriteName || "pftransfer-download.txt"));
+    console.log(`saving name ${fullPath} to ${saveOptions.path} as ${identity}`);
     const socket = socketio.connect(server);
     socket.emit('receiver', identity);
     var p = new Peer({ initiator: false, trickle: true, wrtc: wrtc })
-    const stream = fs.createWriteStream(overwriteFilename, { flags: "wx" })
+    const stream = fs.createWriteStream(fullPath, { flags: "wx" })
     stream.on('error', (error) => {
         console.log("error writing file: " + error);
         callback(error);

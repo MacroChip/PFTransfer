@@ -1,7 +1,5 @@
 import * as client from "../client";
 import fetch from 'node-fetch';
-import * as unusedFilename from "unused-filename";
-import * as path from "path";
 
 import { ipcRenderer } from 'electron'
 
@@ -26,7 +24,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
         });
     });
     document.getElementById("receive").addEventListener("click", () => {
-        client.receive(unusedFilename.sync(path.join(downloadPath, "pftransfer-download.txt")), (<HTMLInputElement>document.getElementById("myId")).value, serverUrl, (error) => {
+        client.receive({ path: downloadPath }, (<HTMLInputElement>document.getElementById("myId")).value, serverUrl, (error) => {
             console.log("done: " + error);
         });
     });
