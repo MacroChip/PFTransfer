@@ -75,8 +75,7 @@ const receive = (saveOptions: SaveOptions, identity: string, server: string, cal
                 callback(null);
             });
         } else {
-            console.log("received chunk");
-            stream.write(data); //TODO: respect backpressure and draining
+            stream.write(Buffer.from(data)); //TODO: respect backpressure and draining
         }
     })
 };
