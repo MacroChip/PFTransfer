@@ -10,6 +10,7 @@
     "tsc": "tsc",
     "dist": "electron-builder",
     "dist:windows": "tsc && npm run dist -- --win --x64 && cp wrtc.node dist/win-unpacked/resources/app/node_modules/wrtc/build/Release/wrtc.node",
+    "dist:zip": "zip -r pftransfer.zip dist/win-unpacked/",
     "docker": "docker run --rm -ti --env ELECTRON_CACHE=\"/root/.cache/electron\" --env ELECTRON_BUILDER_CACHE=\"/root/.cache/electron-\" -v ${PWD}:/project -v ~/.cache/electron:/root/.cache/electron -v ~/.cache/electron-builder:/root/.cache/electron-builder electronuserland/builder:wine",
     "find-binaries": "cd node_modules/wrtc && ../.bin/node-pre-gyp reveal hosted_tarball --target_platform=win32"
   },
