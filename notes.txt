@@ -1,0 +1,7 @@
+simple-peer is a stream, therefore, i cannot assume that my data will be received in the same chunks that i sent it in
+options:
+-2 peer connections. 1 for metadata/controls, 1 for data
+-switch the stream in and out of a control vs data mode
+-parse the stream live looking for control events
+-use socket.io-p2p but strip out the fallback stuff
+-use https://github.com/tomcartwrightuk/socket.io-p2p-parser in order to know when binary data has completed sending
