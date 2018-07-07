@@ -43,7 +43,7 @@ const send = (filename: string, recipient: string, server: string, callback?: Fu
 };
 
 const receive = (saveOptions: SaveOptions, identity: string, server: string, callback: (err: NodeJS.ErrnoException) => void) => {
-    const fullPath = unusedFilename.sync(path.join(saveOptions.path, saveOptions.overwriteName || "pftransfer-download.txt"));
+    const fullPath = unusedFilename.sync(path.join(saveOptions.path, saveOptions.overwriteName || "pftransfer-download"));
     console.log(`saving name ${fullPath} to ${saveOptions.path} as ${identity}`);
     const socket = socketio.connect(server);
     socket.emit('receiver', identity);
