@@ -8,36 +8,34 @@ const start = () => {
     const httpServer = new Server(app);
     const io = socketIo(httpServer);
 
-    let sender: Socket;
-    let senderSignalData = [];
-    let receiver: Socket;
-    let receiverSignalData = [];
-    let intendedReceiverId: string;
-    let reportedReceiverId: string;
+    let exchanges: Exchange[] = [];
 
     io.on('connection', (socket: Socket) => {
         console.log('a user connected');
         socket.on('sender', (recipient) => {
-            sender = socket;
-            intendedReceiverId = recipient;
-            senderSignalData = [];
+            let newExchange = new Exchange();
+            exchanges[socket.id] = newExchange;
+            newExchange.role = "sender";
+            newExchange.socket = socket;
+            newExchange.intendedReceiverId = recipient;
         });
         socket.on('sender signal', (data) => {
             console.log("sender signal");
-            senderSignalData.push(data);
-            sendSignalData();
+            exchanges[socket.id].signalData.push(data);
+            sendSignalData(exchanges);
         });
         socket.on('receiver signal', (data) => {
             console.log("receiver signal");
-            receiver = socket;
-            receiverSignalData.push(data);
-            sendSignalData();
+            exchanges[socket.id].signalData.push(data);
+            sendSignalData(exchanges);
         });
         socket.on('receiver', (id) => {
-            receiver = socket;
-            reportedReceiverId = id;
-            receiverSignalData = [];
-            sendSignalData();
+            let newExchange = new Exchange();
+            exchanges[socket.id] = newExchange;
+            newExchange.role = 'receiver';
+            newExchange.socket = socket;
+            newExchange.reportedReceiverId = id;
+            sendSignalData(exchanges);
         });
     });
     console.log("starting server");
@@ -46,20 +44,29 @@ const start = () => {
         console.log('listening on *:' + port);
     });
 
-    let sendSignalData = () => {
-        if (sender && receiver && intendedReceiverId === reportedReceiverId && senderSignalData.length > 0) {
-            senderSignalData.forEach(item => {
-                receiver.emit('sender signal', item);
-            });
-            senderSignalData = [];
-        } else if (sender && receiver && intendedReceiverId === reportedReceiverId && receiverSignalData.length > 0) {
-            receiverSignalData.forEach(item => {
-                sender.emit('receiver signal', item);
-            });
-            receiverSignalData = [];
+    let sendSignalData = (exchanges) => {
+        for (let key1 in exchanges) {
+            let item = exchanges[key1];
+            for (let key2 in exchanges) {
+                let item2 = exchanges[key2];
+                if ((item.intendedReceiverId === item2.reportedReceiverId || item.reportedReceiverId === item2.intendedReceiverId) && item.signalData.length > 0) {
+                    item.signalData.forEach(signal => {
+                        item2.socket.emit(item.role + ' signal', signal);
+                    });
+                    item.signalData = [];
+                }
+            }
         }
     };
 };
+
+class Exchange {
+    role: 'sender' | 'receiver';
+    socket: Socket;
+    signalData = [];
+    intendedReceiverId: string;
+    reportedReceiverId: string;
+}
 
 export {
     start
