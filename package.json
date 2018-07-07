@@ -9,7 +9,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
     "dist": "electron-builder",
-    "dist:windows": "tsc && npm run dist -- --win --x64",
+    "dist:windows": "tsc && npm run dist -- --win --x64 && cp wrtc.node dist/win-unpacked/resources/app/node_modules/wrtc/build/Release/wrtc.node",
     "docker": "docker run --rm -ti --env ELECTRON_CACHE=\"/root/.cache/electron\" --env ELECTRON_BUILDER_CACHE=\"/root/.cache/electron-\" -v ${PWD}:/project -v ~/.cache/electron:/root/.cache/electron -v ~/.cache/electron-builder:/root/.cache/electron-builder electronuserland/builder:wine",
     "find-binaries": "cd node_modules/wrtc && ../.bin/node-pre-gyp reveal hosted_tarball --target_platform=win32"
   },
