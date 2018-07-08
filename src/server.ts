@@ -8,34 +8,43 @@ const start = () => {
     const httpServer = new Server(app);
     const io = socketIo(httpServer);
 
-    let exchanges: Exchange[] = [];
+    let senders: Exchanger[] = [];
+    let receivers: Exchanger[] = [];
+
+    let exchanges: Exchange[] = []; //not threadsafe
 
     io.on('connection', (socket: Socket) => {
         console.log('a user connected');
         socket.on('sender', (recipient) => {
-            let newExchange = new Exchange();
-            exchanges[socket.id] = newExchange;
-            newExchange.role = "sender";
-            newExchange.socket = socket;
-            newExchange.intendedReceiverId = recipient;
+            let newExchanger = new Exchanger();
+            senders[socket.id] = newExchanger;
+            newExchanger.role = "sender";
+            newExchanger.socket = socket;
+            if (!exchanges[recipient]) {
+                exchanges[recipient] = new Exchange(recipient);
+            }
+            exchanges[recipient].sender = newExchanger;
         });
         socket.on('sender signal', (data) => {
             console.log("sender signal");
-            exchanges[socket.id].signalData.push(data);
-            sendSignalData(exchanges);
+            senders[socket.id].signalData.push(data);
+            sendSignalData();
         });
         socket.on('receiver signal', (data) => {
             console.log("receiver signal");
-            exchanges[socket.id].signalData.push(data);
-            sendSignalData(exchanges);
+            receivers[socket.id].signalData.push(data);
+            sendSignalData();
         });
         socket.on('receiver', (id) => {
-            let newExchange = new Exchange();
-            exchanges[socket.id] = newExchange;
-            newExchange.role = 'receiver';
-            newExchange.socket = socket;
-            newExchange.reportedReceiverId = id;
-            sendSignalData(exchanges);
+            let newExchanger = new Exchanger();
+            receivers[socket.id] = newExchanger;
+            newExchanger.role = 'receiver';
+            newExchanger.socket = socket;
+            if (!exchanges[id]) {
+                exchanges[id] = new Exchange(id);
+            }
+            exchanges[id].receiver = newExchanger; //TODO: make sure the existing exchange is complete before doing this. If the other people are mid exchange it would break both the old and new people
+            sendSignalData();
         });
     });
     console.log("starting server");
@@ -44,28 +53,39 @@ const start = () => {
         console.log('listening on *:' + port);
     });
 
-    let sendSignalData = (exchanges) => {
-        for (let key1 in exchanges) {
-            let item = exchanges[key1];
-            for (let key2 in exchanges) {
-                let item2 = exchanges[key2];
-                if ((item.intendedReceiverId === item2.reportedReceiverId || item.reportedReceiverId === item2.intendedReceiverId) && item.signalData.length > 0) {
-                    item.signalData.forEach(signal => {
-                        item2.socket.emit(item.role + ' signal', signal);
-                    });
-                    item.signalData = [];
-                }
+    let sendSignalData = () => {
+        for (let exchange in exchanges) { //TODO I don't need to loop over all of them every time. Only for the ones that changed
+            let item = exchanges[exchange];
+            if (item.sender && item.receiver) {
+                item.sender.signalData.forEach(signal => {
+                    item.receiver.socket.emit('sender signal', signal);
+                });
+                item.sender.signalData = [];
+
+                item.receiver.signalData.forEach(signal => {
+                    item.sender.socket.emit('receiver signal', signal);
+                });
+                item.receiver.signalData = [];
             }
         }
     };
 };
 
-class Exchange {
+class Exchanger {
     role: 'sender' | 'receiver';
-    socket: Socket;
+    socket: Socket; //should probably just store the id
     signalData = [];
-    intendedReceiverId: string;
-    reportedReceiverId: string;
+}
+
+class Exchange {
+
+    constructor(id){
+        this.id = id;
+    }
+
+    id: string;
+    sender: Exchanger;
+    receiver: Exchanger;
 }
 
 export {
