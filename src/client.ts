@@ -37,7 +37,10 @@ const send = (filename: string, recipient: string, server: string, callback?: Fu
             if (callback) callback(error);
         });
         stream.on('data', (data) => {
-            p.send(data);
+            const chunkSize = 16384; //from https://github.com/webrtc/samples/blob/gh-pages/src/content/datachannel/filetransfer/js/main.js#L93
+            for (let i = 0; i < data.length; i++) {
+                p.send(data.slice(i * chunkSize, (i + 1) * chunkSize));
+            }
         });
     });
 };
