@@ -5,3 +5,5 @@ options:
 -parse the stream live looking for control events
 -use socket.io-p2p but strip out the fallback stuff
 -use https://github.com/tomcartwrightuk/socket.io-p2p-parser in order to know when binary data has completed sending
+
+could use speedomer like webtorrent

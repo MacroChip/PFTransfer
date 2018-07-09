@@ -16,7 +16,7 @@ const send = (filename: string, recipient: string, server: string, callback?: Fu
     })
 
     p.on('signal', (data) => {
-        console.log('SIGNAL', JSON.stringify(data))
+        console.log('SIGNAL ' + JSON.stringify(data))
         socket.emit('sender signal', JSON.stringify(data));
     })
 
@@ -58,7 +58,7 @@ const receive = (saveOptions: SaveOptions, identity: string, server: string, cal
         callback(err);
     })
     p.on('signal', (data) => {
-        console.log('SIGNAL', JSON.stringify(data))
+        console.log('SIGNAL ' + JSON.stringify(data))
         socket.emit('receiver signal', JSON.stringify(data));
     });
     socket.on('sender signal', (data) => {
