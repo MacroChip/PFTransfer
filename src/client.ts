@@ -36,12 +36,7 @@ const send = (filename: string, recipient: string, server: string, callback?: Fu
             console.log('Error reading data.');
             if (callback) callback(error);
         });
-        stream.on('data', (data) => {
-            const chunkSize = 16384; //from https://github.com/webrtc/samples/blob/gh-pages/src/content/datachannel/filetransfer/js/main.js#L93
-            for (let i = 0; i < data.length; i++) {
-                p.send(data.slice(i * chunkSize, (i + 1) * chunkSize));
-            }
-        });
+        stream.pipe(p, { end: false });
     });
 };
 
@@ -78,7 +73,7 @@ const receive = (saveOptions: SaveOptions, identity: string, server: string, cal
                 callback(null);
             });
         } else {
-            stream.write(Buffer.from(data)); //TODO: respect backpressure and draining
+            stream.write(Buffer.from(data)) //TODO: respect backpressure. TODO: consider piping into file
         }
     })
 };
