@@ -4,6 +4,9 @@ import * as Peer from 'simple-peer';
 import * as wrtc from 'wrtc';
 import * as unusedFilename from "unused-filename";
 import * as path from "path";
+import * as speedometer from "speedometer";
+import { Spinner } from "clui";
+import * as bytes from "bytes";
 
 const send = (filename: string, recipient: string, server: string, callback?: Function) => {
     console.log(`sending ${filename} to ${recipient}`);
@@ -41,6 +44,8 @@ const send = (filename: string, recipient: string, server: string, callback?: Fu
 };
 
 const receive = (saveOptions: SaveOptions, identity: string, server: string, callback: (err: NodeJS.ErrnoException) => void) => {
+    const speed = speedometer();
+    const status = new Spinner('Downloading', ['⣾', '⣽', '⣻', '⢿', '⡿', '⣟', '⣯', '⣷'].reverse());
     const fullPath = unusedFilename.sync(path.join(saveOptions.path, saveOptions.overwriteName || "pftransfer-download"));
     console.log(`saving name ${fullPath} to ${saveOptions.path} as ${identity}`);
     const socket = socketio.connect(server);
@@ -64,15 +69,19 @@ const receive = (saveOptions: SaveOptions, identity: string, server: string, cal
     });
     p.on('connect', () => {
         console.log('CONNECT')
+        status.start();
     })
     p.on('data', (data) => {
         if (data.toString() === 'transfer complete') {
             console.log("transfer complete.");
+            status.stop();
             stream.end(() => {
                 console.log("file written")
                 callback(null);
             });
         } else {
+            var bytesPerSecond = speed(data.length)
+            status.message(bytes.format(bytesPerSecond) + '/second')
             stream.write(Buffer.from(data)) //TODO: respect backpressure. TODO: consider piping into file
         }
     })
