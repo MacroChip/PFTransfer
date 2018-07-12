@@ -6,7 +6,9 @@ let main = () => {
     if (argv.argv._[0] === "server") {
         server.start();
     } else if (argv.argv._[0] === "send") {
-        client.send(argv.argv.f, argv.argv.r, argv.argv.s);
+        client.send(argv.argv.f, argv.argv.r, argv.argv.s, (err) => {
+            console.log(err)
+        });
     } else if (argv.argv._[0] === "receive") {
         client.receive({ path: ".", overwriteName: argv.argv.f}, argv.argv.i, argv.argv.s, (err) => {
             console.log("done: " + err);
