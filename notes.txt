@@ -5,5 +5,15 @@ options:
 -parse the stream live looking for control events
 -use socket.io-p2p but strip out the fallback stuff
 -use https://github.com/tomcartwrightuk/socket.io-p2p-parser in order to know when binary data has completed sending
+    -"socket.io-p2p-parser": "tomcartwrightuk/socket.io-p2p-parser"
+        -this may have been merged into the default parser
 
 could use speedomer like webtorrent
+
+Turns out that webrtc has some severe message size limits. This causes a bunch of overhead but simple-peer is aware of the limits
+-Can I increase simple-peer's MAX_BUFFERED_AMOUNT to see if it gets faster?
+-do I need to use webrtc? Can I tunnel something else like torrenting through 443?
+-compile chromium with a bigger buffer of usrsctp
+-use this https://github.com/saltyrtc/chunked-dc-js. Idk if this needs to be put in wrtc or app code
+
+https://chromium.googlesource.com/external/webrtc/+/master/api/datachannelinterface.h is the interface that has buffered_amount. Need to see implementers of this to see the buffering in action
