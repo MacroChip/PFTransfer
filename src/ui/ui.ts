@@ -2,6 +2,7 @@ import * as client from "../client";
 import fetch from 'node-fetch';
 
 import { ipcRenderer } from 'electron'
+import { UiStatus } from "./uiStatus";
 
 let downloadPath = ".";
 
@@ -19,12 +20,12 @@ document.addEventListener("DOMContentLoaded", (event) => {
             .catch(err => (<HTMLInputElement>document.getElementById("status")).value = err);
     });
     document.getElementById("send").addEventListener("click", () => {
-        client.send((<HTMLInputElement>document.getElementById("sendFilename")).files[0].path, (<HTMLInputElement>document.getElementById("receiverId")).value, serverUrl, (error) => {
+        client.send((<HTMLInputElement>document.getElementById("sendFilename")).files[0].path, (<HTMLInputElement>document.getElementById("receiverId")).value, serverUrl, new UiStatus(), (error) => {
             console.log("done: " + error);
         });
     });
     document.getElementById("receive").addEventListener("click", () => {
-        client.receive({ path: downloadPath }, (<HTMLInputElement>document.getElementById("myId")).value, serverUrl, (error) => {
+        client.receive({ path: downloadPath }, (<HTMLInputElement>document.getElementById("myId")).value, serverUrl, new UiStatus(), (error) => {
             console.log("done: " + error);
         });
     });
