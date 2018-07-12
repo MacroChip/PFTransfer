@@ -21,7 +21,6 @@ yargs
       .option('f', {
         describe: 'filename that received file will be saved to',
         type: 'string',
-        demand: 'please specify a filename to save to',
         nargs: 1,
       })
       .option('i', {

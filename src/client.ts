@@ -7,6 +7,7 @@ import * as path from "path";
 import * as speedometer from "speedometer";
 import { Spinner } from "clui";
 import * as bytes from "bytes";
+import { Metadata } from "./save/metadata";
 
 const send = (filename: string, recipient: string, server: string, callback?: Function) => {
     console.log(`sending ${filename} to ${recipient}`);
@@ -29,7 +30,8 @@ const send = (filename: string, recipient: string, server: string, callback?: Fu
 
     p.on('connect', () => {
         console.log('CONNECT')
-        let stream = fs.createReadStream(filename); //default chunk size
+        p.send(JSON.stringify({ metadata: { filename: path.basename(filename) } }));
+        let stream = fs.createReadStream(filename);
         stream.on('end', () => {
             console.log('Read all data.');
             p.send('transfer complete');
@@ -46,16 +48,11 @@ const send = (filename: string, recipient: string, server: string, callback?: Fu
 const receive = (saveOptions: SaveOptions, identity: string, server: string, callback: (err: NodeJS.ErrnoException) => void) => {
     const speed = speedometer();
     const status = new Spinner('Downloading', ['⣾', '⣽', '⣻', '⢿', '⡿', '⣟', '⣯', '⣷'].reverse());
-    const fullPath = unusedFilename.sync(path.join(saveOptions.path, saveOptions.overwriteName || "pftransfer-download"));
-    console.log(`saving name ${fullPath} to ${saveOptions.path} as ${identity}`);
+    console.log(`settings ${JSON.stringify(saveOptions)} as ${identity}`);
     const socket = socketio.connect(server);
     socket.emit('receiver', identity);
     var p = new Peer({ initiator: false, trickle: true, wrtc: wrtc })
-    const stream = fs.createWriteStream(fullPath, { flags: "wx" })
-    stream.on('error', (error) => {
-        console.log("error writing file: " + error);
-        callback(error);
-    })
+    let stream;
     p.on('error', (err) => {
         console.log('error:' + err);
         callback(err);
@@ -72,6 +69,7 @@ const receive = (saveOptions: SaveOptions, identity: string, server: string, cal
         status.start();
     })
     p.on('data', (data) => {
+        let metadata: Metadata = tryMetadata(data);  //TODO: reorganize if statements so that this isn't done every time
         if (data.toString() === 'transfer complete') {
             console.log("transfer complete.");
             status.stop();
@@ -79,12 +77,26 @@ const receive = (saveOptions: SaveOptions, identity: string, server: string, cal
                 console.log("file written")
                 callback(null);
             });
+        } else if (metadata) {
+            const fullPath = unusedFilename.sync(path.join(saveOptions.path, saveOptions.overwriteName || metadata.filename || "pftransfer-download"));
+            stream = fs.createWriteStream(fullPath, { flags: "wx" })
+            stream.on('error', (error) => {
+                console.log("error writing file: " + error);
+                callback(error);
+            })
         } else {
             var bytesPerSecond = speed(data.length)
             status.message(bytes.format(bytesPerSecond) + '/second')
             stream.write(Buffer.from(data)) //TODO: respect backpressure. TODO: consider piping into file
         }
     })
+
+    let tryMetadata = (data) => {
+        try {
+            return JSON.parse(data.toString()).metadata;
+        } catch (e) {
+        }
+    };
 };
 
 export {
