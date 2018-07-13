@@ -2,15 +2,24 @@ import { Status } from "../status";
 import { Spinner } from "clui";
 import * as speedometer from "speedometer";
 import * as bytes from "bytes";
+import * as readline from "readline";
 
 export class CliStatus implements Status {
     status: Spinner;
     speed: any;
+    rl: any;
+    totalSize: number;
+    currentSize: number = 0;
 
     start(size: number) {
         this.speed = speedometer();
         this.status = new Spinner('Downloading', ['⣾', '⣽', '⣻', '⢿', '⡿', '⣟', '⣯', '⣷'].reverse());
         this.status.start();
+        this.rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+        this.totalSize = size;
     }
 
     stop() {
@@ -20,6 +29,20 @@ export class CliStatus implements Status {
     message(received: number) {
         var bytesPerSecond = this.speed(received)
         this.status.message(bytes.format(bytesPerSecond) + '/second');
+        readline.cursorTo(this.rl, 0);
+        this.currentSize += received;
+        this.rl.write(this.progressBar(this.currentSize / this.totalSize));
+    }
+
+
+    progressBar(percent) {
+        percent = Math.floor(percent * 100);
+        let str = `%${percent}[`;
+        str += '='.repeat(percent);
+        str += '>'
+        str += ' '.repeat(Math.max(99 - percent, 0));
+        str += '] ';
+        return str
     }
 
 }
