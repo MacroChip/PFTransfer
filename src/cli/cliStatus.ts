@@ -32,7 +32,7 @@ export class CliStatus implements Status {
         readline.moveCursor(this.rl, 0, -1)
         readline.cursorTo(this.rl, 0);
         this.currentSize += received;
-        this.rl.write(this.progressBar(this.currentSize / this.totalSize));
+        process.stdout.write(this.progressBar(this.currentSize / this.totalSize));
         readline.moveCursor(this.rl, 0, 1)
     }
 

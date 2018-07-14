@@ -11,7 +11,7 @@ const start = () => {
     let senders: Exchanger[] = [];
     let receivers: Exchanger[] = [];
 
-    let exchanges: Exchange[] = []; //not threadsafe
+    let exchanges: Exchange[] = [];
 
     io.on('connection', (socket: Socket) => {
         console.log('a user connected');

@@ -17,3 +17,9 @@ Turns out that webrtc has some severe message size limits. This causes a bunch o
 -use this https://github.com/saltyrtc/chunked-dc-js. Idk if this needs to be put in wrtc or app code
 
 https://chromium.googlesource.com/external/webrtc/+/master/api/datachannelinterface.h is the interface that has buffered_amount. Need to see implementers of this to see the buffering in action
+
+cancel button
+batch upload
+upload progress bar
+speed over time graph
+activity log with stats - speed, time, who transferred
