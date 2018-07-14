@@ -1,5 +1,4 @@
 import * as client from "../client";
-import fetch from 'node-fetch';
 
 import { ipcRenderer } from 'electron'
 import { UiStatus } from "./uiStatus";
@@ -14,11 +13,6 @@ ipcRenderer.once('download-path', (event, arg) => {
 const serverUrl = "https://pftransfer.herokuapp.com";
 
 document.addEventListener("DOMContentLoaded", (event) => {
-    document.getElementById("startServer").addEventListener("click", () => {
-        fetch(serverUrl)
-            .then(res => (<HTMLInputElement>document.getElementById("status")).value = "SERVER SHOULD BE READY")
-            .catch(err => (<HTMLInputElement>document.getElementById("status")).value = err);
-    });
     document.getElementById("send").addEventListener("click", () => {
         client.send((<HTMLInputElement>document.getElementById("sendFilename")).files[0].path, (<HTMLInputElement>document.getElementById("receiverId")).value, serverUrl, new UiStatus(), (error) => {
             console.log("done: " + error);
