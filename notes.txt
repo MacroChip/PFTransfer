@@ -23,3 +23,6 @@ batch upload
 upload progress bar
 speed over time graph
 activity log with stats - speed, time, who transferred
+
+
+right now my auth0 integration assumes unique ids. Beware that there could be a collision between two providers. i.e. twitter user id 1 signs up and facebook user 1 sign up

@@ -2,13 +2,12 @@ import * as express from "express";
 import { Server } from "http";
 import * as socketIo from "socket.io";
 import { Socket } from "socket.io";
-import Auth0Strategy = require('passport-auth0');
+import * as passportConfig from "./passportConfig";
 import passport = require('passport');
-
 
 const start = () => {
     const app = express();
-    preparePassport();
+    passportConfig.preparePassport(app, passport);
     const httpServer = new Server(app);
     const io = socketIo(httpServer);
 
@@ -49,10 +48,12 @@ const start = () => {
 
     io.on('connection', (socket: Socket) => {
         console.log('a user connected');
-        socket.on('sender', () => {
+        socket.on('sender', (ack) => {
             let newExchanger = new Exchanger();
             senders[socket.id] = newExchanger;
             newExchanger.socket = socket;
+            console.log("sender received")
+            ack();
         });
         socket.on('sender signal', (data) => {
             console.log("sender signal");
@@ -91,24 +92,6 @@ const start = () => {
                 item.receiver.signalData = [];
             }
         }
-    };
-
-    var preparePassport = () => {
-        var strategy = new Auth0Strategy({
-            domain:       'pftransfer.auth0.com',
-            clientID:     'vDJInl1tRNLjgCnWDlPxqYSoLaFmao3r',
-            clientSecret: process.env.AUTH0_CLIENT_SECRET,
-            callbackURL:  '/callback'
-           },
-           function(accessToken, refreshToken, extraParams, profile, done) {
-             // accessToken is the token to call Auth0 API (not needed in the most cases)
-             // extraParams.id_token has the JSON Web Token
-             // profile has all the information from the user
-             return done(null, profile);
-           }
-         );
-
-         passport.use(strategy);
     };
 
     var areFriends = (friend1, friend2): boolean => {

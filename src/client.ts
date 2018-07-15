@@ -12,10 +12,14 @@ const send = (filename: string, recipient: string, server: string, status: Statu
     console.log(`sending ${filename} to ${recipient}`);
     const socket = socketio.connect(server);
     socket.emit('sender', () => {
+        console.log(process.env.PROTOCOL + process.env.HOSTNAME + '/send')
         fetch(process.env.PROTOCOL + process.env.HOSTNAME + '/send', { method: "PUT", body: JSON.stringify({
             "socketId": socket.id,
             recipient
-        })})
+        })}).then(result => {
+            console.log(result)
+            callback(null, result.url)
+        })
     });
     var p = new Peer({ initiator: true, trickle: true, wrtc: wrtc })
     p.on('error', (err) => {
