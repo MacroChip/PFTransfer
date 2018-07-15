@@ -11,7 +11,7 @@ let main = () => {
             console.log(err)
         });
     } else if (argv.argv._[0] === "receive") {
-        client.receive({ path: ".", overwriteName: argv.argv.f}, argv.argv.i, argv.argv.s, new CliStatus(), (err) => {
+        client.receive({ path: ".", overwriteName: argv.argv.f}, argv.argv.s, new CliStatus(), (err) => {
             console.log("done: " + err);
         });
     }

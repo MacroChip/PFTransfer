@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", (event) => {
         });
     });
     document.getElementById("receive").addEventListener("click", () => {
-        client.receive({ path: downloadPath }, (<HTMLInputElement>document.getElementById("myId")).value, serverUrl, new UiStatus(), (error) => {
+        client.receive({ path: downloadPath }, serverUrl, new UiStatus(), (error) => {
             console.log("done: " + error);
         });
     });

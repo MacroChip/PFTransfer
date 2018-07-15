@@ -4,8 +4,8 @@
   "description": "Personal File Transfer",
   "main": "app/index.js",
   "scripts": {
-    "start": "tsc && NODE_ENV=development electron . --enable-logging",
-    "start:cli": "tsc && NODE_ENV=development node app/cli.js",
+    "start": "tsc && PROTOCOL=http:// HOSTNAME=localhost NODE_ENV=development electron . --enable-logging",
+    "start:cli": "tsc && PROTOCOL=http:// HOSTNAME=localhost NODE_ENV=development node app/cli.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
     "dist": "electron-builder",

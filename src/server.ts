@@ -2,9 +2,13 @@ import * as express from "express";
 import { Server } from "http";
 import * as socketIo from "socket.io";
 import { Socket } from "socket.io";
+import Auth0Strategy = require('passport-auth0');
+import passport = require('passport');
+
 
 const start = () => {
     const app = express();
+    preparePassport();
     const httpServer = new Server(app);
     const io = socketIo(httpServer);
 
@@ -13,17 +17,42 @@ const start = () => {
 
     let exchanges: Exchange[] = [];
 
+    app.get('/callback', passport.authenticate('auth0', { failureRedirect: '/login' }), (req: any, res) => {
+        if (!req.user) {
+            throw new Error('user null');
+        }
+        res.status(200).send();
+    });
+
+    app.get('/login', passport.authenticate('auth0', {}), (req, res) => {
+        res.send({"friends" : ["friend1", "friend2"]});
+    });
+
+    app.put('/send', passport.authenticate('auth0', {}), (req: any, res) => {
+        if (areFriends(req.user.id, req.body.recipient)) {
+            if (!exchanges[req.body.recipient]) {
+                exchanges[req.body.recipient] = new Exchange(req.body.recipient);
+            }
+            exchanges[req.body.recipient].sender = senders[req.body.socketId]
+        }
+        res.send()
+    });
+
+    app.put('/receive', passport.authenticate('auth0', {}), (req: any, res) => {
+        if (!exchanges[req.user.id]) {
+            exchanges[req.user.id] = new Exchange(req.user.id);
+        }
+        exchanges[req.user.id].receiver = receivers[req.body.socketId] //TODO: make sure the existing exchange is complete before doing this. If the other people are mid exchange it would break both the old and new people
+        res.send()
+        sendSignalData();
+    });
+
     io.on('connection', (socket: Socket) => {
         console.log('a user connected');
-        socket.on('sender', (recipient) => {
+        socket.on('sender', () => {
             let newExchanger = new Exchanger();
             senders[socket.id] = newExchanger;
-            newExchanger.role = "sender";
             newExchanger.socket = socket;
-            if (!exchanges[recipient]) {
-                exchanges[recipient] = new Exchange(recipient);
-            }
-            exchanges[recipient].sender = newExchanger;
         });
         socket.on('sender signal', (data) => {
             console.log("sender signal");
@@ -35,16 +64,10 @@ const start = () => {
             receivers[socket.id].signalData.push(data);
             sendSignalData();
         });
-        socket.on('receiver', (id) => {
+        socket.on('receiver', () => {
             let newExchanger = new Exchanger();
             receivers[socket.id] = newExchanger;
-            newExchanger.role = 'receiver';
             newExchanger.socket = socket;
-            if (!exchanges[id]) {
-                exchanges[id] = new Exchange(id);
-            }
-            exchanges[id].receiver = newExchanger; //TODO: make sure the existing exchange is complete before doing this. If the other people are mid exchange it would break both the old and new people
-            sendSignalData();
         });
     });
     console.log("starting server");
@@ -69,10 +92,31 @@ const start = () => {
             }
         }
     };
+
+    var preparePassport = () => {
+        var strategy = new Auth0Strategy({
+            domain:       'pftransfer.auth0.com',
+            clientID:     'vDJInl1tRNLjgCnWDlPxqYSoLaFmao3r',
+            clientSecret: process.env.AUTH0_CLIENT_SECRET,
+            callbackURL:  '/callback'
+           },
+           function(accessToken, refreshToken, extraParams, profile, done) {
+             // accessToken is the token to call Auth0 API (not needed in the most cases)
+             // extraParams.id_token has the JSON Web Token
+             // profile has all the information from the user
+             return done(null, profile);
+           }
+         );
+
+         passport.use(strategy);
+    };
+
+    var areFriends = (friend1, friend2): boolean => {
+        return true;
+    };
 };
 
 class Exchanger {
-    role: 'sender' | 'receiver';
     socket: Socket; //should probably just store the id
     signalData = [];
 }

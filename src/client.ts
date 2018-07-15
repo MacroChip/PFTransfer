@@ -6,11 +6,17 @@ import * as unusedFilename from "unused-filename";
 import * as path from "path";
 import { Metadata } from "./save/metadata";
 import { Status } from "./status";
+import fetch from 'node-fetch';
 
 const send = (filename: string, recipient: string, server: string, status: Status, callback?: Function) => {
     console.log(`sending ${filename} to ${recipient}`);
     const socket = socketio.connect(server);
-    socket.emit('sender', recipient);
+    socket.emit('sender', () => {
+        fetch(process.env.PROTOCOL + process.env.HOSTNAME + '/send', { method: "PUT", body: JSON.stringify({
+            "socketId": socket.id,
+            recipient
+        })})
+    });
     var p = new Peer({ initiator: true, trickle: true, wrtc: wrtc })
     p.on('error', (err) => {
         console.log('error: ' + err);
@@ -48,10 +54,14 @@ const send = (filename: string, recipient: string, server: string, status: Statu
     });
 };
 
-const receive = (saveOptions: SaveOptions, identity: string, server: string, status: Status, callback: (err: NodeJS.ErrnoException) => void) => {
-    console.log(`settings ${JSON.stringify(saveOptions)} as ${identity}`);
+const receive = (saveOptions: SaveOptions, server: string, status: Status, callback: (err: NodeJS.ErrnoException) => void) => {
+    console.log(`settings ${JSON.stringify(saveOptions)}`);
     const socket = socketio.connect(server);
-    socket.emit('receiver', identity);
+    socket.emit('receiver', () => {
+        fetch(process.env.PROTOCOL + process.env.HOSTNAME + '/receive', { method: "PUT", body: JSON.stringify({
+            "socketId": socket.id
+        })})
+    });
     var p = new Peer({ initiator: false, trickle: true, wrtc: wrtc })
     let stream;
     p.on('error', (err) => {
