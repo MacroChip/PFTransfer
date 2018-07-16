@@ -29,6 +29,7 @@
     "@types/yargs": "^11.0.0",
     "bytes": "^3.0.0",
     "clui": "^0.3.6",
+    "connect-ensure-login": "^0.1.1",
     "express": "^4.16.3",
     "express-session": "^1.15.6",
     "node-fetch": "^2.1.2",

@@ -8,18 +8,27 @@ import { Metadata } from "./save/metadata";
 import { Status } from "./status";
 import fetch from 'node-fetch';
 
-const send = (filename: string, recipient: string, server: string, status: Status, callback?: Function) => {
+const url = process.env.PROTOCOL + process.env.HOSTNAME;
+
+const send = (filename: string, recipient: string, server: string, status: Status, session, callback?: Function) => {
     console.log(`sending ${filename} to ${recipient}`);
     const socket = socketio.connect(server);
     socket.emit('sender', () => {
-        console.log(process.env.PROTOCOL + process.env.HOSTNAME + '/send')
-        fetch(process.env.PROTOCOL + process.env.HOSTNAME + '/send', { method: "PUT", body: JSON.stringify({
+        fetch(url + '/send', { method: "PUT", body: JSON.stringify({
             "socketId": socket.id,
             recipient
         })}).then(result => {
             console.log(result)
-            callback(null, result.url)
-        })
+            if (result.ok) {
+                return Promise.resolve();
+            }
+            return callback(null, result.url)
+        }).then(() => {
+            return fetch(url + '/friends');
+        }).then(it => it.json())
+        .then(friends => {
+            console.log(friends);
+        });
     });
     var p = new Peer({ initiator: true, trickle: true, wrtc: wrtc })
     p.on('error', (err) => {

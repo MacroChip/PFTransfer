@@ -4,6 +4,8 @@ import * as socketIo from "socket.io";
 import { Socket } from "socket.io";
 import * as passportConfig from "./passportConfig";
 import passport = require('passport');
+import * as authChecker from "./authChecker";
+const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn();
 
 const start = () => {
     const app = express();
@@ -16,18 +18,22 @@ const start = () => {
 
     let exchanges: Exchange[] = [];
 
-    app.get('/callback', passport.authenticate('auth0', { failureRedirect: '/login' }), (req: any, res) => {
+    app.get('/callback', passport.authenticate('auth0', { failureRedirect: '/login' }), authChecker.authChecker, (req: any, res) => {
         if (!req.user) {
             throw new Error('user null');
         }
-        res.status(200).send();
+        res.status(200).send("Success! Close this window to continue");
+    });
+
+    app.get('/friends', authChecker.authChecker, (req, res) => {
+        res.send(['thottie1']);
     });
 
     app.get('/login', passport.authenticate('auth0', {}), (req, res) => {
-        res.send({"friends" : ["friend1", "friend2"]});
+        res.send("you are logged in");
     });
 
-    app.put('/send', passport.authenticate('auth0', {}), (req: any, res) => {
+    app.put('/send', ensureLoggedIn, (req: any, res) => {
         if (areFriends(req.user.id, req.body.recipient)) {
             if (!exchanges[req.body.recipient]) {
                 exchanges[req.body.recipient] = new Exchange(req.body.recipient);
@@ -37,7 +43,7 @@ const start = () => {
         res.send()
     });
 
-    app.put('/receive', passport.authenticate('auth0', {}), (req: any, res) => {
+    app.put('/receive', authChecker.authChecker, (req: any, res) => {
         if (!exchanges[req.user.id]) {
             exchanges[req.user.id] = new Exchange(req.user.id);
         }
