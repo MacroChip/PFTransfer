@@ -71,10 +71,11 @@ const start = () => {
             receivers[socket.id].signalData.push(data);
             sendSignalData();
         });
-        socket.on('receiver', () => {
+        socket.on('receiver', (ack) => {
             let newExchanger = new Exchanger();
             receivers[socket.id] = newExchanger;
             newExchanger.socket = socket;
+            ack();
         });
     });
     console.log("starting server");
