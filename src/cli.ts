@@ -7,11 +7,11 @@ let main = () => {
     if (argv.argv._[0] === "server") {
         server.start();
     } else if (argv.argv._[0] === "send") {
-        client.send(argv.argv.f, argv.argv.r, argv.argv.s, new CliStatus(), (err) => {
+        client.send(argv.argv.f, argv.argv.r, argv.argv.s, new CliStatus(), null, (err) => {
             console.log(err)
         });
     } else if (argv.argv._[0] === "receive") {
-        client.receive({ path: ".", overwriteName: argv.argv.f}, argv.argv.s, new CliStatus(), (err) => {
+        client.receive({ path: ".", overwriteName: argv.argv.f}, argv.argv.s, new CliStatus(), null, (err) => {
             console.log("done: " + err);
         });
     }

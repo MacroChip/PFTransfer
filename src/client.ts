@@ -7,10 +7,11 @@ import * as path from "path";
 import { Metadata } from "./save/metadata";
 import { Status } from "./status";
 import fetch from 'node-fetch';
+import { Login } from "./ui/loginPage";
 
 const url = process.env.PROTOCOL + process.env.HOSTNAME;
 
-const send = (filename: string, recipient: string, server: string, status: Status, session, callback?: Function) => {
+const send = (filename: string, recipient: string, server: string, status: Status, login: Login, callback?: Function) => {
     console.log(`sending ${filename} to ${recipient}`);
     const socket = socketio.connect(server);
     socket.emit('sender', () => {
@@ -22,7 +23,7 @@ const send = (filename: string, recipient: string, server: string, status: Statu
             if (result.ok) {
                 return Promise.resolve();
             }
-            return callback(null, result.url)
+            return login.login(null, result.url)
         }).then(() => {
             return fetch(url + '/friends');
         }).then(it => it.json())
@@ -67,7 +68,7 @@ const send = (filename: string, recipient: string, server: string, status: Statu
     });
 };
 
-const receive = (saveOptions: SaveOptions, server: string, status: Status, callback: (err: NodeJS.ErrnoException) => void) => {
+const receive = (saveOptions: SaveOptions, server: string, status: Status, login: any, callback: (err: NodeJS.ErrnoException) => void) => {
     console.log(`settings ${JSON.stringify(saveOptions)}`);
     const socket = socketio.connect(server);
     socket.emit('receiver', () => {
