@@ -4,9 +4,12 @@ import * as socketIo from "socket.io";
 import { Socket } from "socket.io";
 import * as passportConfig from "./passportConfig";
 import passport = require('passport');
-import * as authChecker from "./authChecker";
 const ensureLoggedIn = require('connect-ensure-login').ensureLoggedIn();
-
+const env = {
+    AUTH0_CLIENT_ID: 'eu5i0gLvltEIgq7XMGeeSbuH2loHMFsJ',
+    AUTH0_DOMAIN: 'pftransfer.auth0.com',
+    AUTH0_CALLBACK_URL: 'http://localhost:3000/callback'
+  };
 const start = () => {
     const app = express();
     passportConfig.preparePassport(app, passport);
@@ -18,18 +21,25 @@ const start = () => {
 
     let exchanges: Exchange[] = [];
 
-    app.get('/callback', passport.authenticate('auth0', { failureRedirect: '/login' }), authChecker.authChecker, (req: any, res) => {
+    app.get('/callback', passport.authenticate('auth0', { failureRedirect: '/login' }), (req: any, res) => {
         if (!req.user) {
             throw new Error('user null');
         }
         res.status(200).send("Success! Close this window to continue");
     });
 
-    app.get('/friends', authChecker.authChecker, (req, res) => {
+    app.get('/friends', ensureLoggedIn, (req, res) => {
         res.send(['thottie1']);
     });
 
-    app.get('/login', passport.authenticate('auth0', {}), (req, res) => {
+    app.get('/login', passport.authenticate('auth0', {
+        clientID: env.AUTH0_CLIENT_ID,
+        domain: env.AUTH0_DOMAIN,
+        redirectUri: env.AUTH0_CALLBACK_URL,
+        audience: 'https://' + env.AUTH0_DOMAIN + '/userinfo',
+        responseType: 'code',
+        scope: 'openid'
+    }), (req, res) => {
         res.send("you are logged in");
     });
 
@@ -43,7 +53,7 @@ const start = () => {
         res.send()
     });
 
-    app.put('/receive', authChecker.authChecker, (req: any, res) => {
+    app.put('/receive', ensureLoggedIn, (req: any, res) => {
         if (!exchanges[req.user.id]) {
             exchanges[req.user.id] = new Exchange(req.user.id);
         }

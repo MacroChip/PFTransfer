@@ -6,7 +6,6 @@ import * as unusedFilename from "unused-filename";
 import * as path from "path";
 import { Metadata } from "./save/metadata";
 import { Status } from "./status";
-import fetch from 'node-fetch';
 import { Login } from "./ui/loginPage";
 
 const url = process.env.PROTOCOL + process.env.HOSTNAME;

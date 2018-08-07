@@ -3,7 +3,9 @@ import {app, BrowserWindow} from 'electron';
 let win;
 
 let createWindow = () => {
-    win = new BrowserWindow({width: 800, height: 600});
+    win = new BrowserWindow({width: 800, height: 600, webPreferences: {
+        partition: "persist:auth0"
+    }});
     win.loadFile('static/index.html');
     win.webContents.openDevTools()
     win.webContents.on('did-finish-load', () => {
