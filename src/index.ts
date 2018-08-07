@@ -5,7 +5,7 @@ let win;
 let createWindow = () => {
     win = new BrowserWindow({width: 800, height: 600});
     win.loadFile('static/index.html');
-    win.webContents.openDevTools()
+    // win.webContents.openDevTools()
     win.webContents.on('did-finish-load', () => {
         win.webContents.send('download-path', app.getPath('downloads'))
     })

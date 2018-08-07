@@ -7,24 +7,28 @@
   <body>
     <h1>PFTransfter</h1>
     <div>
-      <label for="sendFilename">File to send</label>
-      <input id="sendFilename" type="file" />
-      <label for="receiverId">Receiver Id</label>
-      <input id="receiverId" type="text" />
-      <button id="send">Send</button>
-    </div>
-    <div>
-      <label for="myId">My Id</label>
-      <input id="myId" type="text" />
-      <button id="receive">Receive</button>
-    </div>
-    <div>
       <div class="label">Progress: </div>
       <progress id="progress" max="0" value="0"></progress>
     </div>
     <div>
       <label for="status">Status:</label>
       <textarea readonly id="status"></textarea>
+    </div>
+    <br>
+    <h2>Send a file:</h2>
+    <div>
+      <label for="sendFilename">File to send</label>
+      <input id="sendFilename" type="file" />
+      <label for="receiverId">Receiver's Id</label>
+      <input id="receiverId" type="text" />
+      <button id="send">Send</button>
+    </div>
+    <h3>OR</h3>
+    <h2>Receive a file:</h2>
+    <div>
+      <label for="myId">My Id</label>
+      <input id="myId" type="text" />
+      <button id="receive">Receive</button>
     </div>
   </body>
   <script>

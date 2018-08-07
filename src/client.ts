@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as socketio from "socket.io-client";
 import * as Peer from 'simple-peer';
-import * as wrtc from 'wrtc';
+// import * as wrtc from 'wrtc';
 import * as unusedFilename from "unused-filename";
 import * as path from "path";
 import { Metadata } from "./save/metadata";
@@ -11,7 +11,7 @@ const send = (filename: string, recipient: string, server: string, status: Statu
     console.log(`sending ${filename} to ${recipient}`);
     const socket = socketio.connect(server);
     socket.emit('sender', recipient);
-    var p = new Peer({ initiator: true, trickle: true, wrtc: wrtc })
+    var p = new Peer({ initiator: true, trickle: true })
     p.on('error', (err) => {
         console.log('error: ' + err);
         if (callback) callback(err);
@@ -52,7 +52,7 @@ const receive = (saveOptions: SaveOptions, identity: string, server: string, sta
     console.log(`settings ${JSON.stringify(saveOptions)} as ${identity}`);
     const socket = socketio.connect(server);
     socket.emit('receiver', identity);
-    var p = new Peer({ initiator: false, trickle: true, wrtc: wrtc })
+    var p = new Peer({ initiator: false, trickle: true })
     let stream;
     p.on('error', (err) => {
         console.log('error:' + err);
