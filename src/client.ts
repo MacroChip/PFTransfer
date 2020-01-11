@@ -30,6 +30,7 @@ const send = (filename: string, recipient: string, server: string, status: Statu
         console.log('CONNECT')
         var stats = fs.statSync(filename)
         var fileSizeInBytes = stats["size"]
+        status.start(fileSizeInBytes, "Uploading")
         p.send(JSON.stringify({ metadata: {
             filename: path.basename(filename),
             filesize: fileSizeInBytes
@@ -37,6 +38,7 @@ const send = (filename: string, recipient: string, server: string, status: Statu
         let stream = fs.createReadStream(filename);
         stream.on('end', () => {
             console.log('Read all data.');
+            status.stop()
             p.send('transfer complete');
             if (callback) callback();
         });
@@ -78,7 +80,7 @@ const receive = (saveOptions: SaveOptions, identity: string, server: string, sta
                 callback(null);
             });
         } else if (metadata) {
-            status.start(metadata.filesize);
+            status.start(metadata.filesize, "Downloading");
             const fullPath = unusedFilename.sync(path.join(saveOptions.path, saveOptions.overwriteName || metadata.filename || "pftransfer-download"));
             console.log(`Saving file as ${fullPath}`)
             stream = fs.createWriteStream(fullPath, { flags: "wx" })

@@ -11,9 +11,9 @@ export class CliStatus implements Status {
     totalSize: number;
     currentSize: number = 0;
 
-    start(size: number) {
+    start(size: number, label: string) {
         this.speed = speedometer();
-        this.status = new Spinner('Downloading', ['⣾', '⣽', '⣻', '⢿', '⡿', '⣟', '⣯', '⣷'].reverse());
+        this.status = new Spinner(label, ['⣾', '⣽', '⣻', '⢿', '⡿', '⣟', '⣯', '⣷'].reverse());
         this.status.start();
         this.rl = readline.createInterface({
             input: process.stdin,
@@ -35,7 +35,6 @@ export class CliStatus implements Status {
         process.stdout.write(this.progressBar(this.currentSize / this.totalSize));
         readline.moveCursor(this.rl, 0, 1)
     }
-
 
     progressBar(percent) {
         percent = Math.floor(percent * 100);

@@ -9,9 +9,10 @@ export class UiStatus implements Status {
     status: HTMLInputElement = document.getElementById("status") as HTMLInputElement;
     totalReceived: number = 0;
 
-    start(size: number) {
+    start(size: number, label: string) {
         this.speed = speedometer();
         this.progress.max = size;
+        this.status.value = label
     }
 
     stop() {
