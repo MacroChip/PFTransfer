@@ -47,6 +47,9 @@ const send = (filename: string, recipient: string, server: string, status: Statu
             if (callback) callback(error);
         });
         stream.pipe(p, { end: false });
+        stream.on('data', data => {
+            status.message(data.length)
+        })
     });
 };
 
