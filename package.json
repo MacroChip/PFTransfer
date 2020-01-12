@@ -35,7 +35,7 @@
     "speedometer": "^1.1.0",
     "typescript": "^2.9.2",
     "unused-filename": "^2.1.0",
-    "wrtc": "^0.1.5",
+    "wrtc": "^0.3.7",
     "yargs": "^11.0.0"
   },
   "devDependencies": {
