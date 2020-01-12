@@ -34,7 +34,7 @@
     "socket.io": "^2.3.0",
     "speedometer": "^1.1.0",
     "typescript": "^2.9.2",
-    "unused-filename": "^1.0.0",
+    "unused-filename": "^2.1.0",
     "wrtc": "^0.1.5",
     "yargs": "^11.0.0"
   },
