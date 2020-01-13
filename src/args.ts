@@ -42,6 +42,9 @@ yargs
   })
   .help('h')
   .alias('h', 'help')
+  .string('f')
+  .string('r')
+  .string('i')
   .wrap(null)
   .argv;
 
