@@ -17,6 +17,10 @@
   "engines": {
     "node": "8.10.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MacroChip/PFTransfer.git"
+  },
   "author": "Chip Thien",
   "license": "ISC",
   "dependencies": {
